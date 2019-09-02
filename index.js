@@ -3,9 +3,11 @@ const express = require('express')
 //Creates an Express application using the express module
 const server = express()
 //Makes the database available to the server
-const Users = require('./data/db.js')
+const db = require('./data/db.js')
+const cors = require('cors')
 
-server.use(express.json());
+server.use(express.json())
+server.use(cors())
 
 // server sanity check
 server.get('/', (req, res) => {
@@ -15,33 +17,33 @@ server.get('/', (req, res) => {
 // GET users end points
 //Returns an array of all the user objects contained in the database.
 server.get('/api/users', (req, res) => {
-    Users.find()
+    db.find()
     .then(users => {
         res.status(200).json(users)
     })
     .catch(() => {
       res.status(500).json({
-        errorMessage: 'The users information could not be retrieved.',
+        errorMessage: 'This user wants nothing to do with you.',
       })
     })
 })
 
 //Returns the user object with the specified `id`.
 server.get('/api/users/:id', (req, res) => {
-  Users.findById(req.params.id)
+  db.findById(req.params.id)
     .then(user => {
       if (user) {
         res.status(200).json(user);
       } else {
         res
           .status(404)
-          .json({ message: 'The user with the specified ID does not exist.' });
+          .json({ message: 'Get a grip there are only so many users.' });
       }
     })
     .catch(() => {
       res
         .status(500)
-        .json({ errorMessage: 'The user information could not be retrieved.' });
+        .json({ errorMessage: 'That user is on a cruise in Alaska.' });
     });
 });
 
@@ -52,9 +54,9 @@ server.post('/api/users', (req, res) => {
   if (!name || !bio) {
     res
       .status(400)
-      .json({ errorMessage: 'Please provide name and bio for the user.' });
+      .json({ errorMessage: 'There are only two catagories how hard is it to type the right ones?.' });
   } else {
-    Users.insert(req.body)
+    db.insert(req.body)
       .then(user => {
         res.status(201).json(user);
       })
@@ -69,11 +71,11 @@ server.post('/api/users', (req, res) => {
 
 //Removes the user with the specified `id` and returns the deleted user.
 server.delete('/api/users/:id', (req, res) => {
-  Users.remove(req.params.id)
+  db.remove(req.params.id)
     .then(count => {
       if (count && count > 0) {
         res.status(200).json({
-          message: 'the user was deleted.',
+          message: 'You just murdured the user.',
         });
       } else {
         res
@@ -82,7 +84,7 @@ server.delete('/api/users/:id', (req, res) => {
       }
     })
     .catch(() => {
-      res.status(500).json({ errorMessage: 'The user could not be removed' });
+      res.status(500).json({ errorMessage: 'That user is here to stay' });
     });
 });
 
@@ -94,9 +96,9 @@ server.put('/api/users/:id', (req, res) => {
   if (!name || !bio) {
     res
       .status(400)
-      .json({ errorMessage: 'Please provide name and bio for the user.' });
+      .json({ errorMessage: 'Again there are only 2 categories, use them both!' });
   } else {
-    Users.update(req.params.id, req.body)
+    db.update(req.params.id, req.body)
       .then(user => {
         if (user) {
           res.status(200).json(user);
@@ -104,13 +106,13 @@ server.put('/api/users/:id', (req, res) => {
           res
             .status(404)
             .json({
-              message: 'The user with the specified ID does not exist.',
+              message: 'That user died in a horrible plane crash.',
             });
         }
       })
       .catch(() => {
         res.status(500).json({
-          errorMessage: 'The user information could not be modified.',
+          errorMessage: 'That is the users name. You dont have permission to change it',
         });
       });
   }
